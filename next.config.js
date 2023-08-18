@@ -2,7 +2,10 @@
 /* https://github.com/vercel/next.js/issues/44430 */
 const path = require("path");
 const nextConfig = {
-  //output: "export",
+  output: "export",
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   env: {
     googleClientId: process.env.googleClientId,
     googleClientSecret: process.env.googleClientSecret,

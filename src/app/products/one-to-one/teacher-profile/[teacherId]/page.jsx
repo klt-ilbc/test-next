@@ -26,7 +26,7 @@ import {
 import EducationCard from "@/app/components/profile/teacher-profile/EducationCard";
 import { dummyEducation, dummySectionData } from "@/app/utils/constant";
 
-const page = () => {
+const TeacherProfile = () => {
   const [currSelSec, setcurrSelSec] = useState(dummySectionData[0]);
   const arr = [1, 2, 3, 1, 1, 1, 1, 1, 1];
   return (
@@ -282,7 +282,7 @@ const page = () => {
                       {!item.available && "unavailable"}
                     </Typography>
                   </Box>
-                ),
+                )
               )}
             </Stack>
             <Box
@@ -297,8 +297,9 @@ const page = () => {
               py={2}
               gap={1}
             >
-              {arr.map((item) => (
+              {arr.map((item, index) => (
                 <Stack
+                  key={index}
                   direction="row"
                   bgcolor="#FFF"
                   borderRadius="25px"
@@ -390,4 +391,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default TeacherProfile;
