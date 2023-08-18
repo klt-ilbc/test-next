@@ -23,7 +23,6 @@ import { useRouter } from "next/navigation";
 import api from "@/app/config/api";
 import RenderCircularProgress from "@/app/components/RenderCircularProgress";
 import ErrorAlert from "@/app/components/ErrorAlert";
-import sha256 from "crypto-js/sha256";
 
 const LoginForm = ({ open, setShowLoginDialog }) => {
   const [userRole, setUserRole] = useState("student");
