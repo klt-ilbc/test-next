@@ -1,5 +1,5 @@
 export default async function Home() {
-  const res = await fetch("https://jsonplaceholder.typicode.com/posts/1", {
+  const res = await fetch(process.env.CUSTOM_API, {
     cache: "no-store",
   });
   const data = await res.json();
