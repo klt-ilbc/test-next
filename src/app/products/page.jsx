@@ -13,7 +13,7 @@ export const MainProducts = [
       "linear-gradient(141deg, #D2C8FF 0%, rgba(255, 188, 232, 0.8) 0%)",
     name: "One-to-One",
     image: "/images/OtoO.png",
-    linkTo: "one-to-one",
+    linkTo: "/one-to-one",
   },
   {
     id: 2,
@@ -24,7 +24,7 @@ export const MainProducts = [
     name: "One-to-Many",
 
     image: "/images/OtoM.png",
-    linkTo: "one-to-many",
+    linkTo: "/one-to-many",
   },
   {
     id: 3,
@@ -34,7 +34,7 @@ export const MainProducts = [
       "linear-gradient(141deg, #D0F3F7 0%, rgba(182, 227, 248, 0.8) 0%)",
     name: "Edu + ZayBanGyi",
     image: "/images/ZayBanGyi.png",
-    linkTo: "zaybangyi",
+    linkTo: "/zaybangyi",
   },
   {
     id: 4,
@@ -44,7 +44,7 @@ export const MainProducts = [
       "linear-gradient(141deg, #FFE6C8 0%, rgba(255, 252, 188, 0.8) 100%)",
     name: "Edu + Connect",
     image: "/images/edu+ connect.png",
-    linkTo: "edu-connect",
+    linkTo: "/edu-connect",
   },
 ];
 

@@ -17,24 +17,22 @@ import { useSession } from "next-auth/react";
 import moment from "moment";
 import TimePickerMui from "../forms/TimePickerMui";
 import TimePickerReact from "../TimePickerReact";
+import ErrorAlert from "../ErrorAlert";
 
 const CreateMeetingForm = ({ open, setOpen, courses }) => {
-  let coursess = [
-    { "course_name": "test" },
-    { "course_name": "test2" }
-  ]
+  let coursess = [{ course_name: "test" }, { course_name: "test2" }];
 
   const { data } = useSession();
   // console.log(data)
 
   async function postJSON(data) {
-    console.log("postJsoonfun ht")
+    console.log("postJsoonfun ht");
     try {
       const response = await fetch("http://54.251.187.226/api/meeting/create", {
         method: "POST", // or 'PUT'
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${data?.accessToken}`
+          Authorization: `Bearer ${data?.accessToken}`,
         },
         body: JSON.stringify(data),
       });
@@ -60,32 +58,54 @@ const CreateMeetingForm = ({ open, setOpen, courses }) => {
       }}
     >
       <Formik
-        initialValues={{ start_time: undefined, end_time: undefined, course_id: "", test_date_time: undefined,test_time: undefined }}
+        initialValues={{
+          start_time: undefined,
+          end_time: undefined,
+          course_id: "",
+          test_date_time: undefined,
+          test_time: undefined,
+        }}
         onSubmit={(values) => {
           // same shape as initial values
           console.log(values);
           let formdata = new FormData();
-          formdata.append("test_date_time", values.test_date_time);
-          formdata.append("test_time", values.test_time);
-          formdata.append("start_time", values.start_time );//"10:00:00"
-          formdata.append("end_tiime", values.end_time);//"11:00:00"
-          formdata.append("course_id", values.course_id);//"2"
-          console.log(formdata)
-          console.log("moment", moment(values.test_date_time).format("YYYY-MM-DD HH:mm:ss"))
-          console.log("momentII", moment(values.test_date_time).format("LTS"))
-          console.log("momentIII", moment(values.test_date_time).toISOString())
-          console.log("momentIV", moment(values.test_time).toISOString())
-          console.log(moment(values.test_time).format("hh:mm:ss"))
-          console.log(moment(values.test_date_time).format("hh:mm:ss"));
-          console.log("moment", moment(values.start_time).format("YYYY-MM-DD HH:mm:ss"))
+          //formdata.append("test_date_time", values.test_date_time);
+          //formdata.append("test_time", values.test_time);
+          formdata.append("start_time", "2023-08-17T10:00"); //"10:00:00"
+          formdata.append("end_time", "2023-08-18T10:00"); //"11:00:00"
+          formdata.append("course_id", values.course_id); //"2"
+          console.log(formdata);
+          // console.log("moment", moment(values.test_date_time).format("YYYY-MM-DD HH:mm:ss"))
+          // console.log("momentII", moment(values.test_date_time).format("LTS"))
+          // console.log("momentIII, 2023-08-17T10:00", moment(values.test_date_time).toISOString())
+          console.log(
+            "momentIV=2023-08-17T10:00",
+            moment(values.test_time).toISOString(),
+          );
+          // console.log(moment(values.test_time).format("hh:mm:ss"))
+          // console.log(moment(values.test_date_time).format("hh:mm:ss"));
+          // console.log("moment", moment(values.start_time).format("YYYY-MM-DD HH:mm:ss"))
           //console.log(JSON.stringify(values))
+          //
+          console.log("bakend accepted format");
+          console.log(values);
           try {
-            // api.post('/meeting/create', formdata, `${data?.accessToken}`).then(res => {
-            //   console.log(res)
-            // })
+            api
+              .post(
+                `/meeting/create/${values.course_id}`,
+                formdata,
+                `${data?.accessToken}`,
+              )
+              .then((res) => {
+                if (res.status == 200) {
+                  console.log("meeting created");
+                } else {
+                  setErrorMessage(res.message);
+                }
+              });
             //postJSON(formdata)
           } catch (error) {
-            console.log(error)
+            console.log(error);
           }
         }}
       >
@@ -112,7 +132,7 @@ const CreateMeetingForm = ({ open, setOpen, courses }) => {
                   }}
                   {...formikProps}
                 />
-                <Field
+                {/* <Field
                   name="test_time"
                   component={TimePickerMui}
                   validate={isRequired}
@@ -121,8 +141,8 @@ const CreateMeetingForm = ({ open, setOpen, courses }) => {
                     formikProps.setFieldValue("test_time", newValue)
                   }}
                   {...formikProps}
-                />
-                <TimePickerReact/>
+                /> */}
+                {/* <TimePickerReact /> */}
                 <Field
                   name="start_time"
                   component={DatePickerField}

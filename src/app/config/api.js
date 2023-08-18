@@ -6,6 +6,7 @@ const get = (path, params, token) => {
 };
 
 const post = (path, params, token) => {
+  console.log(path, params,token)
   return doRequest(path, params, "POST", token);
 };
 
@@ -24,6 +25,7 @@ const objectToQueryString = (obj) => {
 };
 
 const doRequest = async (path, params, method, activeToken) => {
+  console.log("tokenforMeeting=>",activeToken)
   const options = { method, headers: {} };
   if (params) {
     if (method === "GET") {
@@ -36,7 +38,8 @@ const doRequest = async (path, params, method, activeToken) => {
   if (activeToken) {
     options.headers = new Headers({
       'Accept': 'application/json',
-      //'Authorization': `Bearer ${activeToken}`,
+      'Authorization': `${activeToken}`,
+      'Access-Control-Allow-Origin': "*"
     })
   }
 
@@ -51,7 +54,7 @@ const doRequest = async (path, params, method, activeToken) => {
       //console.log(result)
       return result;
     });
-  });
+  }).catch(error => error);
 };
 export default {
   get,

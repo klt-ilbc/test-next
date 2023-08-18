@@ -1,6 +1,6 @@
 "use client";
 import { Alert, Typography, Card, Container } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 // import CardMainProduct from "../../../components/CardMainProducts";
 // import LabelMainProducts from "../../../components/LabelMainProducts";
 import { useRouter } from "next/navigation";
@@ -28,23 +28,52 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function QuickLearnVideos() {
   const { push } = useRouter();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [haveData, sethaveData] = useState(false);
+  const [videos, setVideos] = useState([]);
+  const [haveError, setHaveError] = useState(false);
+  const [errormsg, setErrorMsg] = useState("");
+  // const { loading, haveData, haveError, videos, intruder } = useSelector((state) => ({
+  //   ...state.quickLearnVideosData,
+  // }));
+  // useEffect(() => {
+  //   dispatch(fetchQuickLearnVideos());
+  // }, []);
 
-  const { loading, haveData, haveError, videos } = useSelector((state) => ({
-    ...state.quickLearnVideosData,
-  }));
   useEffect(() => {
-    dispatch(fetchQuickLearnVideos());
+    fetch("https://edtech.ilbc.edu.mm/api/videos").then((response) => {
+      setLoading(true)
+      if (response.status === 204) {
+        setLoading(false);
+        sethaveData(false);
+        setHaveError(true);
+        return undefined;
+      }
+      if (response.status === 403) {
+        setLoading(false);
+        sethaveData(false);
+        setHaveError(true);
+        activeToken = null;
+      }
+      response.json().then((result) => {
+        setLoading(false);
+        sethaveData(true);
+        setHaveError(false);
+        setVideos(result.videos)
+      });
+    }).catch(error => {
+      setErrorMsg(error.message);
+      return error
+    })
   }, []);
-
-  console.log(videos, 'from vedios')
 
   return (
     <Container
-        maxWidth={false}
-        sx={{
-          maxWidth: "1280px",
-        }}
-      >
+      maxWidth={false}
+      sx={{
+        maxWidth: "1280px",
+      }}
+    >
       <Typography
         variant="h4"
         align="center"
@@ -56,11 +85,14 @@ export default function QuickLearnVideos() {
       </Typography>
       <Grid container spacing={2} mb={8}>
         {
-          loading ?
-            <RenderCircularProgress />
-            : haveError ? <ErrorAlert>Api cannot return data</ErrorAlert>
-              : haveData && videos.length == 0 ? <WarningAlert>There is no data yet!</WarningAlert>
-                : haveData && videos.map(video => <Grid item xs={6} lg={3} md={4} key={video.id}><Item><VideoReactPlayer {...video} /></Item></Grid>)
+          errormsg ?
+            <ErrorAlert>{errormsg}</ErrorAlert> :
+            loading ?
+              <RenderCircularProgress />
+              : haveError ? <ErrorAlert>Api cannot return data</ErrorAlert>
+                // : haveData && intruder ? <ErrorAlert>{intruder}</ErrorAlert>
+                : haveData && videos.length == 0 ? <WarningAlert>There is no data yet!</WarningAlert>
+                  : haveData && videos.map(video => <Grid item xs={6} lg={3} md={4} key={video.id}><Item><VideoReactPlayer {...video} /></Item></Grid>)
         }
       </Grid>
       {/* <VideoReactPlayer url="https://joy1.videvo.net/videvo_files/video/free/2014-07/large_watermarked/Falls9_preview.mp4" /> */}

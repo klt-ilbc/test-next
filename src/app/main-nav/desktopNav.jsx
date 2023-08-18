@@ -26,6 +26,7 @@ import LoginForm from "../(auth)/login/LoginForm";
 import { LogoutOutlined, Person2 } from "@mui/icons-material";
 import { signOut } from "next-auth/react";
 import RenderCircularProgress from "../components/RenderCircularProgress";
+import sha256 from 'crypto-js/sha256';
 
 export default function DesktopNav({
   menuItems,
@@ -40,18 +41,21 @@ export default function DesktopNav({
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const menuRef = useRef(null);
-
   // const handleMenuClose = () => {
   //   setAnchorEl(null);
   //   handleMobileMenuClose();
   // };
-
+console.log(session)
   const handleLogout = (e) => {
     e.preventDefault();
     //signOut(auth);//firebase signOut Usage
-    signOut({ callbackUrl: "/" }); 
-    //next-auth singOut
-    localStorage.removeItem("authToken");
+    if(!session){
+      localStorage.removeItem("authTokenOwn");
+      push("/");
+    }else{
+      signOut({ callbackUrl: "/" }); //next-auth singOut
+    localStorage.removeItem("authTokenOwn");
+    }    
   };
 
   const handleClickOutside = (e) => {
@@ -167,9 +171,12 @@ export default function DesktopNav({
                         <Button
                           sx={{ px: 4 }}
                           startIcon={<Person2 />}
-                          onClick={() =>
-                            push(`/profile/${session?.user?.email}`)
-                          }
+                          onClick={() => {
+                            if (status == "authenticated" || token) {
+                              // push(`/profile/${sha256('userProfile')}`)
+                              push(`/profile}`)
+                            }
+                          }}
                         >
                           Profile
                         </Button>
@@ -194,27 +201,27 @@ export default function DesktopNav({
                 >
                   <RenderCircularProgress size="1.5rem" />
                 </Box>
-            ) : status == "loading" ? (
-              <Box
-                sx={{ width: "120px", paddingTop: "15px", paddingLeft: "60px" }}
-              >
-                <RenderCircularProgress size="1.5rem" />
-              </Box>
-            ) : (
-              <ButtonTransparent
-                size="large"
-                width={120}
-                height={50}
-                border="3px solid #42AAFF"
-                fontWeight="800"
-                sticky={sticky}
-                onClick={() => setShowLoginDialog(true)}
-              >
-                Login
-              </ButtonTransparent>
-            )}
-          </Box>
-        </Toolbar>
+              ) : status == "loading" ? (
+                <Box
+                  sx={{ width: "120px", paddingTop: "15px", paddingLeft: "60px" }}
+                >
+                  <RenderCircularProgress size="1.5rem" />
+                </Box>
+              ) : (
+                <ButtonTransparent
+                  size="large"
+                  width={120}
+                  height={50}
+                  border="3px solid #42AAFF"
+                  fontWeight="800"
+                  sticky={sticky}
+                  onClick={() => setShowLoginDialog(true)}
+                >
+                  Login
+                </ButtonTransparent>
+              )}
+            </Box>
+          </Toolbar>
         </Container>
       </AppBar>
 

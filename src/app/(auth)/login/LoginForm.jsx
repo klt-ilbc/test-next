@@ -23,17 +23,17 @@ import { useRouter } from "next/navigation";
 import api from "@/app/config/api";
 import RenderCircularProgress from "@/app/components/RenderCircularProgress";
 import ErrorAlert from "@/app/components/ErrorAlert";
+import sha256 from "crypto-js/sha256";
 
 const LoginForm = ({ open, setShowLoginDialog }) => {
   const [userRole, setUserRole] = useState("student");
-  const { push, replace } = useRouter();
+  const { push } = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { data: session } = useSession();
   const toggleRole = (role) => {
     setUserRole(role);
   };
-  console.log(session, "session");
 
   return (
     <Dialog
@@ -69,37 +69,31 @@ const LoginForm = ({ open, setShowLoginDialog }) => {
           let formdata = new FormData();
           formdata.append("email", values.email);
           formdata.append("password", values.password);
-          // formdata.append("role", userRole);
+          formdata.append("role", userRole);
           try {
-            api
-              .post(`/${userRole}/login`, formdata)
-              .then((res) => {
-                console.log(res, "from login");
-
-                if (res.status === 200) {
-                  setLoading(false);
-                  localStorage.setItem("authToken", JSON.stringify(res));
-                  push(`/profile/${session?.user?.email}`);
-                  // push({
-                  //   pathname: '/profile',
-                  //   query: {name: userRole}
-                  // })
-                  setShowLoginDialog(false);
-                } else if (res.status === 401) {
-                  setError("You are not authenticated!");
-                  setLoading(false);
-                } else if (res.status === 500) {
-                  setError(res.error);
-                  setLoading(false);
-                } else {
-                  setError("something went wrong!");
-                  setLoading(false);
-                }
-              })
-              .catch((error) => {
-                setError("server return 419 (unknown status)");
+            api.post(`/${userRole}/login`, formdata).then((res) => {
+              if (session) {
+                push(`/profile/`);
+              } else if (res.status == 200) {
                 setLoading(false);
-              });
+                localStorage.setItem("authTokenOwn", sha256(res.data.token));
+                push(`/profile/`);
+                // push({
+                //   pathname: '/profile',
+                //   query: {name: userRole}
+                // })
+                setShowLoginDialog(false);
+              } else if (res.status == 401) {
+                setError("You are not authenticated!");
+                setLoading(false);
+              } else if (res.status == 500) {
+                setError(res.error);
+                setLoading(false);
+              } else {
+                setError("something went wrong!");
+                setLoading(false);
+              }
+            });
           } catch (error) {
             setLoading(false);
             setError(error.message);
@@ -206,7 +200,8 @@ const LoginForm = ({ open, setShowLoginDialog }) => {
                       onClick={(e) => {
                         e.preventDefault();
                         signIn("google", {
-                          callbackUrl: `/profile/${session?.user?.email}`,
+                          //callbackUrl: `/profile/${sha256('userRole')}`,
+                          callbackUrl: `/profile`,
                         });
                       }}
                     >
@@ -244,7 +239,8 @@ const LoginForm = ({ open, setShowLoginDialog }) => {
                     onClick={(e) => {
                       e.preventDefault();
                       signIn("google", {
-                        callbackUrl: "/profile/teacher",
+                        //callbackUrl: `/profile/${sha256('userRole')}`
+                        callbackUrl: `/profile`,
                       });
                     }}
                   >

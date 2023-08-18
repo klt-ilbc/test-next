@@ -10,9 +10,9 @@ async function teacherLoginUpdate(data) {
       //mode: 'cors',
       headers: {
         "Content-Type": "application/json",
-        // 'Access-Control-Allow-Origin': '*'
+        //'Access-Control-Allow-Origin': '*'
       },
-      body: JSON.stringify(data),
+      body: data,
     });
     const result = await response.json();
   } catch (error) {
@@ -33,12 +33,18 @@ export const authOptions = {
     async signIn({ user, account, profile, email, credentials }) {
       //console.log("callbackhit", "user=>", user, "account=>", account, "profile", profile, "email=>", email, "credentials =>", credentials);
       if (account.provider === 'google') {
-        if (user.email !== "demoteacher2@ilbcedu.com") {
+        if (user.email !== "demoteacher@ilbcedu.com") {
           console.log("you are not allowed to proceed")
           return false;
         } else {
           const data = { "name": user.name, "email": user.email, "google_id": account.providerAccountId, "avatar": user.image, "access_token": account.access_token };
-          teacherLoginUpdate(data);
+          let formdata = new FormData();          
+          formdata.append("name", user.name); 
+          formdata.append("email", user.email);
+          formdata.append("google_id", account.providerAccountId);
+          formdata.append("avatar", user.image);
+          formdata.append("access_token", account.access_token);
+          // teacherLoginUpdate(data);
           return true;
         }
       }
@@ -49,8 +55,8 @@ export const authOptions = {
         token.access_token = account.access_token;
         // token.refresh_token = account.refresh_token
       }
-      //return token
-      return refreshAccessToken(token);
+      return token
+      //return refreshAccessToken(token);
     },
     async session({ session, token }) {
       //https://github.com/nextauthjs/next-auth/discussions/1290

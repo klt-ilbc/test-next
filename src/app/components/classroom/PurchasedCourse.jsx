@@ -1,6 +1,6 @@
 import { Alert, Box, Button, Stack, Typography } from "@mui/material";
 import Image from "next/image";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import WatchLaterIcon from "@mui/icons-material/WatchLater";
 import { useRouter } from "next/navigation";
@@ -14,24 +14,65 @@ const PurchasedCourse = () => {
   const router = useRouter();
   const [showCreateMeetingDialog, setShowCreateMeetingDialog] =
     React.useState(false);
-  const { loading, haveData, haveError, courses } = useSelector((state) => ({
-    ...state.coursesData,
-  }));
-  const dispatch = useDispatch();
+  // const { loading, haveData, haveError, courses } = useSelector((state) => ({
+  //   ...state.coursesData,
+  // }));
+  // const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [haveData, sethaveData] = useState(false);
+  const [courses, setCourses] = useState([]);
+  const [haveError, setHaveError] = useState(false);
 
   // const secret = process.env.SECRET;
   // const gToken = getToken({ req, secret });
   // console.log(gToken)
 
-  useEffect(() => {
-    dispatch(fetchCourses());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(fetchCourses());
+  // }, []);
 
   const handleJoinMeeting = () => {
     console.log("join meeting fun hit");
     return router.push("https://meet.google.com/kcg-kxdt-cyt");
+    // return router.push("https://meet.google.com/ekg-xaup-nee");
   };
-  let coursess = [{ course_name: "test" }, { course_name: "test2" }];
+  let coursess = [
+    {
+      course_name: "test",
+      meeting_link: "https://meet.google.com/kcg-kxdt-cyt",
+    },
+    {
+      course_name: "test2",
+      meeting_link: "https://meet.google.com/kcg-kxdt-cyt",
+    },
+  ];
+  useEffect(() => {
+    fetch("https://edtech.ilbc.edu.mm/api/courses")
+      .then((response) => {
+        setLoading(true);
+        if (response.status === 204) {
+          setLoading(false);
+          sethaveData(false);
+          setHaveError(true);
+          return undefined;
+        }
+        if (response.status === 403) {
+          setLoading(false);
+          sethaveData(false);
+          setHaveError(true);
+          activeToken = null;
+        }
+        response.json().then((result) => {
+          //console.log(result);
+          setLoading(false);
+          sethaveData(true);
+          setHaveError(false);
+          setCourses(result.data.data);
+        });
+      })
+      .catch((error) => error);
+  }, []);
+
   return (
     <Stack gap={3}>
       {
@@ -41,8 +82,7 @@ const PurchasedCourse = () => {
         //   <Alert severity="error">Api cannot return data</Alert>
         // ) : haveData && courses.length == 0 ? (
         //   <Alert severity="success">no data yet</Alert>
-        // )
-        //:
+        // ) :
         // haveData &&
         coursess.map((course) => {
           return (
@@ -92,7 +132,7 @@ const PurchasedCourse = () => {
                   </Box>
                 </Box>
               </Box>
-              {Object.keys(course).includes("meetLink") ? (
+              {course.meeting_link ? (
                 <Button
                   sx={{ px: 4, py: 2, borderRadius: "15px" }}
                   variant="outlined"
